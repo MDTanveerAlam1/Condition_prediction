@@ -1,0 +1,44 @@
+import streamlit as st
+import pickle
+import numpy as np
+
+# Load model and encoders
+with open("model.pkl", "rb") as f:
+    model = pickle.load(f)
+
+with open("encoder.pkl", "rb") as f:
+    label_encoders = pickle.load(f)
+
+st.title("Drug Review Sentiment Prediction")
+st.write("Enter your drug name, condition, and review to see sentiment prediction.")
+
+# User input
+drug_name = st.text_input("Drug Name")
+condition = st.text_input("Condition")
+review = st.text_area("Patient Review")
+
+# Prediction button
+if st.button("Predict Sentiment"):
+    if not drug_name or not condition or not review:
+        st.warning("Please fill all fields.")
+    else:
+        try:
+            # Encode drug and condition
+            drug_encoded = label_encoders['drugName'].transform([drug_name])[0]
+            condition_encoded = label_encoders['condition'].transform([condition])[0]
+
+            # You might need to add preprocessing steps (e.g., TF-IDF or tokenization for review)
+            # For demonstration, we just join features
+            input_features = [drug_encoded, condition_encoded]  # Plus review_vector if used
+
+            # If your model uses vectorized review, add logic to transform `review`
+            # For example: review_vector = tfidf.transform([review])
+
+            # Make prediction
+            prediction = model.predict([input_features])  # Adjust input format as needed
+
+            sentiment = "Positive" if prediction[0] == 1 else "Negative"
+            st.success(f"Predicted Sentiment: **{sentiment}**")
+
+        except Exception as e:
+            st.error(f"Error: {e}")
