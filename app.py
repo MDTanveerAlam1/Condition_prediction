@@ -95,7 +95,7 @@ import pandas as pd
 # Load dataset
 @st.cache_data
 def load_data():
-    return pd.read_csv("drugsCom_raw (1).tsv", sep='\t')
+    return pd.read_csv("filter data.csv")
 
 data = load_data()
 
