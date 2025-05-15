@@ -32,10 +32,12 @@ st.markdown("""
 # MedGuide Logo & Header
 
 logo_path = "medguide_logo.png"
+logo = None  # Initialize
+
 if os.path.exists(logo_path):
     logo = Image.open(logo_path)
-    st.image(logo, width=120)
 
+# Display logo if it exists
 if logo:
     st.image(logo, width=120)
 st.title("💊 MedGuide - Drug Recommender")
