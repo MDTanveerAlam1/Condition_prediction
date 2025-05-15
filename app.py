@@ -2,7 +2,7 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# Load model and encoders
+''' # Load model and encoders
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
@@ -42,3 +42,47 @@ if st.button("Predict Sentiment"):
 
         except Exception as e:
             st.error(f"Error: {e}")
+            '''
+
+import streamlit as st
+import pandas as pd
+
+# Load dataset
+@st.cache_data
+def load_data():
+    return pd.read_csv("drugsCom_raw (1).tsv", sep='\t')
+
+data = load_data()
+
+st.title("💊 Drug Review Explorer")
+st.write("Enter a **drug name** to see all related conditions, reviews, and details.")
+
+# User input
+drug_input = st.text_input("Enter Drug Name")
+
+if drug_input:
+    # Filter case-insensitive match
+    filtered_data = data[data['drugName'].str.lower() == drug_input.lower()]
+    
+    if filtered_data.empty:
+        st.warning("No data found for this drug.")
+    else:
+        st.success(f"Found {len(filtered_data)} reviews for **{drug_input.title()}**")
+
+        # List unique conditions
+        conditions = filtered_data['condition'].dropna().unique()
+        st.subheader("🩺 Conditions Treated")
+        for cond in conditions:
+            st.markdown(f"- {cond}")
+
+        # Show review details
+        st.subheader("📝 Patient Reviews")
+        for idx, row in filtered_data.iterrows():
+            st.markdown(f"""
+                **Condition**: {row['condition']}  
+                **Rating**: {row['rating']}  
+                **Review**: {row['review']}  
+                **Useful Count**: {row['usefulCount']}  
+                ---
+            """)
+
