@@ -30,7 +30,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # MedGuide Logo & Header
-logo = import os
 
 logo_path = "medguide_logo.png"
 if os.path.exists(logo_path):
