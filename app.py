@@ -33,15 +33,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # MedGuide Logo & Header
-import os
-
-logo_path = "medguide_logo.png"
-if os.path.exists(logo_path):
-    logo = Image.open(logo_path)
-    st.image(logo, width=120)
-
+logo = Image.open("medguide_logo.png") if "medguide_logo.png" else None
 if logo:
-            st.image(logo, width=120)
+    st.image(logo, width=120)
 st.title("💊 MedGuide - Drug Recommender")
 st.markdown("Find the **best medications** based on patient reviews & ratings.")
 
@@ -129,4 +123,3 @@ st.markdown("""
 ---
 Made with 💙 by MedGuide | All rights reserved © 2025
 """)
-
