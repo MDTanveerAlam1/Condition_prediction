@@ -6,46 +6,72 @@ import pandas as pd
 
 import streamlit as st
 import pandas as pd
+from PIL import Image
 
 # Load dataset
 @st.cache_data
+
 def load_data():
     return pd.read_csv("filter data.csv")
 
 data = load_data()
 
-st.set_page_config(page_title="MedGuide - Drug Recommender", layout="centered")
-st.title("💊 MedGuide - Drug Recommender")
+# Prepare UI Elements
+st.set_page_config(page_title="MedGuide - Drug Recommender", page_icon="💊", layout="centered")
 st.markdown("""
-<style>
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+    <style>
+    .main {
+        background-color: #f2f9ff;
     }
-</style>
+    .stButton>button {
+        background-color: #4da6ff;
+        color: white;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# Input from user
-condition_input = st.text_input("🔍 Enter a medical condition (e.g., Depression, Diabetes, etc.)")
+# MedGuide Logo & Header
+logo = Image.open("medguide_logo.png") if "medguide_logo.png" else None
+if logo:
+    st.image(logo, width=120)
+st.title("💊 MedGuide - Drug Recommender")
+st.markdown("Find the **best medications** based on patient reviews & ratings.")
 
+# Input condition
+condition_input = st.text_input("🔍 Enter Medical Condition (e.g. Depression, Diabetes, etc.)")
+
+# Match common variants for main conditions
+synonyms = {
+    "depression": ["depression", "depressive", "mental health"],
+    "high blood pressure": ["blood pressure", "hypertension"],
+    "diabetes, type 2": ["diabetes", "type 2 diabetes", "sugar"]
+}
+
+def match_condition(user_input):
+    user_input = user_input.lower()
+    for condition, keys in synonyms.items():
+        if any(k in user_input for k in keys):
+            return condition
+    return user_input
+
+# Filtering & Analysis
 if condition_input:
-    # Normalize condition input
-    normalized_input = condition_input.strip().lower()
+    matched_condition = match_condition(condition_input)
+    condition_filtered = data[data['condition'].str.lower() == matched_condition.lower()]
 
-    # Expand matching logic
-    data['condition_lower'] = data['condition'].str.lower()
-    matched_conditions = data[data['condition_lower'].str.contains(normalized_input)]
-
-    if matched_conditions.empty:
-        st.warning("No data found for this condition.")
+    if condition_filtered.empty:
+        st.warning("⚠️ No reviews found for this condition. Try a different keyword.")
     else:
-        st.success(f"Found {len(matched_conditions)} reviews for condition containing: '{condition_input.title()}'")
+        st.success(f"✅ {len(condition_filtered)} reviews found for **{matched_condition.title()}**")
 
-        matched_conditions["is_positive"] = matched_conditions["rating"] >= 7
+        # Mark positive reviews (rating >= 7)
+        condition_filtered["is_positive"] = condition_filtered["rating"] >= 7
 
-        # Group by drug
+        # Group and rank drugs
         drug_stats = (
-            matched_conditions.groupby('drugName')
+            condition_filtered.groupby('drugName')
             .agg(
                 avg_rating=('rating', 'mean'),
                 num_reviews=('rating', 'count'),
@@ -55,52 +81,46 @@ if condition_input:
             .reset_index()
         )
 
-        # Top 3 Recommendations
         st.subheader("🌟 Top 3 Recommended Drugs")
         for i, row in drug_stats.head(3).iterrows():
-            st.markdown(f"""
-                <div style='border:1px solid #DDD; border-radius:8px; padding:10px; margin-bottom:10px;'>
-                <b>{i+1}. {row['drugName']}</b><br>
-                ⭐ Average Rating: {row['avg_rating']:.2f}<br>
-                👍 Positive Reviews: {int(row['positive_reviews'])}<br>
-                💬 Total Reviews: {int(row['num_reviews'])}
-                </div>
-            """, unsafe_allow_html=True)
-
-        # Other Drugs
-        if len(drug_stats) > 3:
-            st.subheader("💊 Other Drugs")
-            for idx, row in drug_stats.iloc[3:].iterrows():
-                drug_name = row['drugName']
-                reviews = matched_conditions[
-                    (matched_conditions['drugName'] == drug_name) &
-                    (matched_conditions['is_positive'])
-                ]['review'].dropna().reset_index(drop=True)
-
-                key_base = drug_name.replace(" ", "_").lower()
-                review_key = f"review_index_{key_base}"
-                button_key = f"show_reviews_{key_base}"
-                next_button_key = f"next_button_{key_base}"
-
-                if review_key not in st.session_state:
-                    st.session_state[review_key] = 0
-
+            with st.container():
                 st.markdown(f"""
-                <div style='border:1px solid #EEE; padding:8px; border-radius:8px; background-color:#ffffff; margin-bottom:10px;'>
-                    <b>{drug_name}</b><br>
-                    ⭐ Rating: {row['avg_rating']:.2f} | 👍 Positive: {int(row['positive_reviews'])} | 💬 Reviews: {int(row['num_reviews'])}
-                </div>
-                """, unsafe_allow_html=True)
+                ### {i+1}. {row['drugName']}
+                - 👍 **Positive Reviews**: {int(row['positive_reviews'])}
+                - ⭐ **Average Rating**: {row['avg_rating']:.2f}
+                - 💬 **Total Reviews**: {int(row['num_reviews'])}
+                """)
+                if st.button(f"📝 Show Reviews for {row['drugName']}", key=f"top_review_{i}"):
+                    reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
+                    pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].head(3)
+                    st.info("### Top Positive Reviews")
+                    for r in pos_reviews.itertuples():
+                        st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
 
-                if st.button(f"Show Reviews for {drug_name}", key=button_key):
-                    review_index = st.session_state[review_key]
-                    reviews_to_show = reviews[review_index:review_index + 2]
+        # Other Drugs Section
+        st.subheader("💊 Other Recommended Drugs")
+        for i, row in drug_stats.iloc[3:].iterrows():
+            with st.container():
+                st.markdown(f"""
+                **{row['drugName']}**
+                - 👍 Positive Reviews: {int(row['positive_reviews'])}
+                - ⭐ Average Rating: {row['avg_rating']:.2f}
+                - 💬 Reviews: {int(row['num_reviews'])}
+                """)
+                if st.button(f"📖 Show Reviews for {row['drugName']}", key=f"review_{i}"):
+                    reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
+                    pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].head(3)
+                    st.info("### Top Positive Reviews")
+                    for r in pos_reviews.itertuples():
+                        st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
+                    if st.button(f"➡️ Next Reviews for {row['drugName']}", key=f"next_{i}"):
+                        more_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].iloc[3:6]
+                        for r in more_reviews.itertuples():
+                            st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
 
-                    for i, review in reviews_to_show.items():
-                        st.markdown(f"> 💬 _Review {review_index + i + 1}_: {review}")
+# Footer
+st.markdown("""
+---
+Made with 💙 by MedGuide | All rights reserved © 2025
+""")
 
-                    if st.button(f"Next Reviews for {drug_name}", key=next_button_key):
-                        if review_index + 2 < len(reviews):
-                            st.session_state[review_key] += 2
-                        else:
-                            st.session_state[review_key] = 0  # Reset
