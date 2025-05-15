@@ -40,8 +40,8 @@ if os.path.exists(logo_path):
     logo = Image.open(logo_path)
     st.image(logo_path, width=120)
 
-if logo_path:
-    st.image(logo_path, width=120)
+if logo:
+    st.image(logo, width=120)
 st.title("💊 MedGuide - Drug Recommender")
 st.markdown("Find the **best medications** based on patient reviews & ratings.")
 
