@@ -18,7 +18,7 @@ st.title("🧠 Condition-Based Drug Recommender")
 st.write("Enter a medical **condition** to see top-rated drugs based on positive user reviews.")
 
 # User input for condition
-condition_input = st.text_input("Enter Condition (e.g. Depression, High Blood Pressure, Diabetes, Type 2]))
+condition_input = st.text_input("Enter Condition (e.g. Depression, High Blood Pressure, Diabetes, Type 2)")
 
 if condition_input:
     # Filter for condition (case-insensitive)
