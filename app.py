@@ -4,6 +4,9 @@ import pickle
 import numpy as np
 import pandas as pd
 
+import streamlit as st
+import pandas as pd
+
 # Load dataset
 @st.cache_data
 def load_data():
@@ -11,38 +14,44 @@ def load_data():
 
 data = load_data()
 
-st.title("💊 Drug Review Explorer")
-st.write("Enter a **drug name** to explore conditions, reviews, and ratings.")
+st.title("🧠 Condition-Based Drug Recommender")
+st.write("Enter a medical **condition** to see the best-rated drugs based on patient reviews.")
 
-# User inputs
-drug_input = st.text_input("Enter Drug Name (e.g. Metformin, Zoloft, etc.)")
-min_rating = st.slider("Minimum Rating Filter", min_value=1, max_value=10, value=1)
+# User input for condition
+condition_input = st.text_input("Enter Condition (e.g. Depression, High Blood Pressure, etc.)")
 
-if drug_input:
-    # Filter data for the drug name (case-insensitive)
-    filtered_data = data[
-        (data['drugName'].str.lower() == drug_input.lower()) &
-        (data['rating'] >= min_rating)
-    ]
+if condition_input:
+    # Filter by condition (case-insensitive)
+    filtered_data = data[data['condition'].str.lower() == condition_input.lower()]
     
     if filtered_data.empty:
-        st.warning("No data found for this drug with the selected rating filter.")
+        st.warning("No data found for this condition.")
     else:
-        st.success(f"Found {len(filtered_data)} reviews for **{drug_input.title()}** (Rating ≥ {min_rating})")
+        st.success(f"Found {len(filtered_data)} reviews for **{condition_input.title()}**")
 
-        # Display unique conditions
-        conditions = filtered_data['condition'].dropna().unique()
-        st.subheader("🩺 Conditions Treated")
-        for cond in conditions:
-            st.markdown(f"- {cond}")
+        # Group by drug, calculate average rating and count
+        drug_ratings = (
+            filtered_data
+            .groupby('drugName')
+            .agg(avg_rating=('rating', 'mean'), num_reviews=('rating', 'count'))
+            .sort_values(by='avg_rating', ascending=False)
+            .reset_index()
+        )
 
-        # Display patient reviews
-        st.subheader("📝 Patient Reviews")
-        for idx, row in filtered_data.iterrows():
+        # Top 3 recommendations
+        st.subheader("🌟 Top 3 Recommended Drugs")
+        for i, row in drug_ratings.head(3).iterrows():
             st.markdown(f"""
-                **Condition**: {row['condition']}  
-                **Rating**: {row['rating']}  
-                **Review**: {row['review']}  
-                **Useful Count**: {row['usefulCount']}  
-                ---
-            """)
+                **{i+1}. {row['drugName']}**  
+                - ⭐ Average Rating: {row['avg_rating']:.2f}  
+                - 💬 Number of Reviews: {row['num_reviews']}  
+                """)
+
+        # Other drugs
+        st.subheader("💊 Other Drugs for This Condition")
+        for i, row in drug_ratings.iloc[3:].iterrows():
+            st.markdown(f"""
+                **{row['drugName']}**  
+                - ⭐ Average Rating: {row['avg_rating']:.2f}  
+                - 💬 Reviews: {row['num_reviews']}  
+                ---""")
