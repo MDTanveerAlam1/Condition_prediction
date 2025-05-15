@@ -3,9 +3,6 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
-
-import streamlit as st
-import pandas as pd
 from PIL import Image
 
 # Load dataset
@@ -33,7 +30,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # MedGuide Logo & Header
-logo = Image.open("medguide_logo.png") if "medguide_logo.png" else None
+logo = import os
+
+logo_path = "medguide_logo.png"
+if os.path.exists(logo_path):
+    logo = Image.open(logo_path)
+    st.image(logo, width=120)
+
 if logo:
     st.image(logo, width=120)
 st.title("💊 MedGuide - Drug Recommender")
