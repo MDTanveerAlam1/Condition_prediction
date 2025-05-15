@@ -33,7 +33,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # MedGuide Logo & Header
-logo = Image.open("medguide_logo.png") if "medguide_logo.png" else None
+import os
+
+logo_path = "medguide_logo.png"
+if os.path.exists(logo_path):
+    logo = Image.open(logo_path)
+    st.image(logo, width=120)
+
 if logo:
     st.image(logo, width=120)
 st.title("💊 MedGuide - Drug Recommender")
