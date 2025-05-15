@@ -44,7 +44,7 @@ st.title("💊 MedGuide - Drug Recommender")
 st.markdown("Find the **best medications** based on patient reviews & ratings.")
 
 # Input condition
-condition_input = st.text_input("🔍 Enter Medical Condition (e.g. Depression, Diabetes, BP, etc.)")
+condition_input = st.text_input("🔍 Enter Medical Condition (e.g. Depression, Diabetes, high blood pressure, etc.)")
 
 # Match common variants for main conditions
 synonyms = {
