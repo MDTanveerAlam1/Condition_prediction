@@ -48,9 +48,35 @@ condition_input = st.text_input("🔍 Enter Medical Condition (e.g. Depression, 
 
 # Match common variants for main conditions
 synonyms = {
-    "depression": ["depression", "depressive", "mental health"],
-    "high blood pressure": ["blood pressure", "hypertension","BP"],
-    "diabetes, type 2": ["diabetes", "type 2 diabetes", "sugar"]
+  "depression": [
+    "depression",
+    "depressive",
+    "mental health",
+    "major depressive disorder",
+    "clinical depression",
+    "low mood",
+    "melancholy",
+    "despair",
+    "blue mood",
+    "sadness"
+  ],
+  "high blood pressure": [
+    "blood pressure",
+    "hypertension",
+    "BP",
+    "raised blood pressure",
+    "high BP",
+    "hypertensive"
+  ],
+  "diabetes, type 2": [
+    "diabetes",
+    "type 2 diabetes",
+    "sugar",
+    "adult-onset diabetes",
+    "non-insulin dependent diabetes",
+    "T2D",
+    "hyperglycemia"
+  ]
 }
 
 def match_condition(user_input):
