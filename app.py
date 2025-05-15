@@ -49,7 +49,7 @@ condition_input = st.text_input("🔍 Enter Medical Condition (e.g. Depression, 
 # Match common variants for main conditions
 synonyms = {
     "depression": ["depression", "depressive", "mental health"],
-    "high blood pressure": ["blood pressure", "hypertension"."BP"],
+    "high blood pressure": ["blood pressure", "hypertension","BP"],
     "diabetes, type 2": ["diabetes", "type 2 diabetes", "sugar"]
 }
 
