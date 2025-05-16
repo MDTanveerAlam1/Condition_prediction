@@ -194,7 +194,7 @@ with open(encoder_path, "rb") as f:
 st.set_page_config(page_title="MedGuide - Drug Recommender", page_icon="💊", layout="centered")
 
 # Custom CSS
-st.markdown("""
+'''st.markdown("""
     <style>
     .main {
         background-color: #f2f9ff;
@@ -206,7 +206,60 @@ st.markdown("""
         font-weight: bold;
     }
     </style>
+""", unsafe_allow_html=True) '''
+
+# Inline CSS Styling
+st.markdown("""
+    <style>
+    /* Background and font */
+    .stApp {
+        background-color: #f4faff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1, h2, h3 {
+        color: #004080;
+    }
+
+    /* Input styling */
+    .stTextInput > div > div > input, .stTextArea textarea {
+        border: 2px solid #4da6ff;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    /* Button styling */
+    .stButton>button {
+        background-color: #007BFF;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 10px 16px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .stButton>button:hover {
+        background-color: #0056b3;
+        transform: scale(1.02);
+    }
+
+    /* Container card styling */
+    .custom-container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #d9e6f2;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Navigation sidebar */
+    .css-1d391kg { background-color: #e6f2ff; }
+    </style>
 """, unsafe_allow_html=True)
+
 
 # Sidebar Navigation
 st.sidebar.title("🔍 Navigation")
