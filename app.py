@@ -151,6 +151,8 @@ if page == "🏠 Home":
                         for r in pos_reviews.itertuples():
                             st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
 
+            
+
             # Toggle for Other Recommendations
 
 
@@ -177,14 +179,23 @@ if page == "🏠 Home":
                         - ⭐ Average Rating: {row['avg_rating']:.2f}
                         - 💬 Reviews: {int(row['num_reviews'])}
                         """)
+                        # Initialize the toggle state in session_state if not already set
+                        
+        
+                        if toggle_key not in st.session_state:
+                           st.session_state[toggle_key] = False
 
+        
                         if st.button(f"📖 Show Reviews for {row['drugName']}", key=f"review_{i}"):
                             st.session_state["active_reviews"] = row['drugName']
 
             # Show reviews if this drug is currently selected
-                        if st.session_state["active_reviews"] == row['drugName']:
+
+                        if st.session_state[toggle_key]:
+                            reviews = condition_filtered[condition_filtered['drugName'] == drug_name]
+                        '''if st.session_state["active_reviews"] == row['drugName']:
                             reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
-                            pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(5)
+                            pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(5)'''
                             st.info("### Top Positive Reviews")
                             for r in pos_reviews.itertuples():
                                 st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
