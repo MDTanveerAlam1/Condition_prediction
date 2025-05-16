@@ -146,7 +146,7 @@ if page == "🏠 Home":
                     """)
                     if st.button(f"📝 Show Reviews for {row['drugName']}", key=f"top_review_{i}"):
                         reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
-                        pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(3)
+                        pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False)
                         st.info("### Top Positive Reviews")
                         for r in pos_reviews.itertuples():
                             st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
