@@ -168,6 +168,10 @@ if page == "🏠 Home":
                             st.info("### Top Positive Reviews")
                             for r in pos_reviews.itertuples():
                                 st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
+                            if st.button(f"➡️ Next Reviews for {row['drugName']}", key=f"next_{i}"):
+                                more_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].iloc[3:6]
+                                for r in more_reviews.itertuples():
+                                    st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
 
 # -------------- PREDICT PAGE --------------
 elif page == "🧪 Predict Review":
