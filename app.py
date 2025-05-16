@@ -194,19 +194,6 @@ with open(encoder_path, "rb") as f:
 st.set_page_config(page_title="MedGuide - Drug Recommender", page_icon="💊", layout="centered")
 
 # Custom CSS
-'''st.markdown("""
-    <style>
-    .main {
-        background-color: #f2f9ff;
-    }
-    .stButton>button {
-        background-color: #4da6ff;
-        color: white;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-    </style>
-""", unsafe_allow_html=True) '''
 
 # Inline CSS Styling
 st.markdown("""
