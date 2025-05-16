@@ -152,8 +152,23 @@ if page == "🏠 Home":
                             st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
 
             # Toggle for Other Recommendations
+
+
+            # Initialize state variables
+            if "show_other" not in st.session_state:
+                st.session_state["show_other"] = False
+
+            if "active_reviews" not in st.session_state:
+                st.session_state["active_reviews"] = None
+
+# Button to show other recommended drugs
             if st.button("📦 Show Other Recommended Drugs"):
+                st.session_state["show_other"] = True
+
+# If toggled on, show other drugs
+            if st.session_state["show_other"]:
                 st.subheader("💊 Other Recommended Drugs")
+
                 for i, row in drug_stats.iloc[3:].iterrows():
                     with st.container():
                         st.markdown(f"""
@@ -162,16 +177,23 @@ if page == "🏠 Home":
                         - ⭐ Average Rating: {row['avg_rating']:.2f}
                         - 💬 Reviews: {int(row['num_reviews'])}
                         """)
+
                         if st.button(f"📖 Show Reviews for {row['drugName']}", key=f"review_{i}"):
+                            st.session_state["active_reviews"] = row['drugName']
+
+            # Show reviews if this drug is currently selected
+                        if st.session_state["active_reviews"] == row['drugName']:
                             reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
                             pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(3)
                             st.info("### Top Positive Reviews")
                             for r in pos_reviews.itertuples():
                                 st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
+
                             if st.button(f"➡️ Next Reviews for {row['drugName']}", key=f"next_{i}"):
                                 more_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].iloc[3:6]
                                 for r in more_reviews.itertuples():
                                     st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
+
 
 # -------------- PREDICT PAGE --------------
 elif page == "🧪 Predict Review":
