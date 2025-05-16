@@ -194,8 +194,8 @@ if page == "🏠 Home":
                         if st.session_state[toggle_key]:
                             reviews = condition_filtered[condition_filtered['drugName'] == drug_name]
                         '''if st.session_state["active_reviews"] == row['drugName']:
-                            reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]
-                            pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(5)'''
+                            reviews = condition_filtered[condition_filtered['drugName'] == row['drugName']]'''
+                            pos_reviews = reviews[reviews['rating'] >= 7][['review', 'rating']].sort_values(by='rating', ascending=False).head(5)
                             st.info("### Top Positive Reviews")
                             for r in pos_reviews.itertuples():
                                 st.markdown(f"⭐ {r.rating}/10 - _{r.review[:250]}..._")
