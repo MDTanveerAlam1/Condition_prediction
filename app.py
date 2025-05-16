@@ -180,12 +180,7 @@ if page == "🏠 Home":
                         - 💬 Reviews: {int(row['num_reviews'])}
                         """)
                         # Initialize the toggle state in session_state if not already set
-                        
-        
-                        if toggle_key not in st.session_state:
-                           st.session_state[toggle_key] = False
 
-        
                         if st.button(f"📖 Show Reviews for {row['drugName']}", key=f"review_{i}"):
                             st.session_state["active_reviews"] = row['drugName']
 
